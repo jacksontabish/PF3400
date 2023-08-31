@@ -120,7 +120,7 @@ class PF3400Controller:
         self.sendcmd(command)
         print(f"Arm moving to Teachpoint {location} with Motion Profile {profile}.")
 
-    def moveAppro(self,location: int,profile: int):
+    def appro(self,location: int,profile: int):
         command = f"moveAppro {location} {profile}"
         self.sendcmd(command)
         print (f"Arm approaching Teachpoint {location} with Motion Profile {profile}.")
@@ -162,6 +162,11 @@ class PF3400Controller:
         command = f"moveOneAxis 5 {self.openGripperPos} {profile}"
         self.sendcmd(command)
 
+    def currentToTeachPoint(self, location: int):
+       #set the robot's current location to a teachpoint in the place of a location index
+       command = f"Here{self.teachpointtype} {location}" #the config parameter can be 'c' or 'j' and specifies if the location willbe Cartesian or Joint
+       self.sendcmd(command)
+
     def TeachPointProtocol(self): 
     # TCP cmd server must be active but motor power must be off
     
@@ -174,11 +179,25 @@ class PF3400Controller:
                 print("Invalid TeachPoint type! Please enter 'c' for Cartesian or 'j' for Joint.")
 
         self.teachpointtype = tptype
-    
-        value = input("How many teachpoints do you wish to set?\n")
-        n = int(value)
+        
+        while True:
+            value = input("How many Teach Points do you wish to set? Enter an integer between 1 and 20: ")
+        
+            if value.isdigit():  # Check if input is a valid integer
+                n = int(value)
+                if 1 <= n <= 20:
+                    break  # Exit the loop if valid input is provided
+                else:
+                    print("Invalid input. Please enter an integer between 1 and 20.")
+            else:
+                print("Invalid input. Please enter a valid integer.")
+
+        zclear = input("Input desired Z clearance (mm).")
+
         for x in range(1, n):
             print(f"Move the arm to the desired location for Teach Point {x}.")
             input("Press Enter when finished moving.")
             self.currentToTeachPoint(x, tptype)
+            command = f"locZClearance {x} {zclear}"
+            self.sendcmd(command)
             
