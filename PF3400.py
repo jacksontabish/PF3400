@@ -161,7 +161,6 @@ class PF3400Controller:
         else:
             return True
 
-
     def setSigVal(self,sigNum,sigVal): #sets signal of sigNum to new sigVal. 0 means off, any nonzero number means on
         command = f"sig {sigNum} {sigVal}"
         self.sendcmd(command)
@@ -250,13 +249,14 @@ class PF3400Controller:
             else:
                 print("Invalid input. Please enter a valid integer.")
 
+        zclear = input("Input desired Z clearance (mm).")
+
         for x in range(1, n):
             print(f"Move the arm to the desired location for Teach Point {x}.")
             input("Press Enter when finished moving.")
             self.currentToTeachPoint(x, tptype)
-            command = f"locZclearance {x} {self.Zclearance}"
+            command = f"locZClearance {x} {zclear}"
             self.sendcmd(command)
-        
     
     def getZclearance(self,location):#not essential
         command = f"locZclearance {location}"
@@ -269,6 +269,11 @@ class PF3400Controller:
         command = f"locZclearance {location} {zclearance}"
         self.sendcmd(command)
         print(f"Z Clearance for Location {location} set to {zclearance}.")
+
+    def setAllZClear(self,zclearance):
+        for x in range(1,20):
+            command = f"locZclearance {x} {zclearance}"
+            self.sendcmd(command)
 
     def getLocConfig(self,location):#not essential
         command = f"locConfig {location}"
@@ -501,21 +506,15 @@ class PF3400Controller:
         gripperpos = self.rcvdata()
         return gripperpos #x y z yaw pitch roll
 
-    def setGripperLoc(self,x,y,z,yaw):
-        command = f"tool {x} {y} {z} {yaw} 90 180"
-        self.sendcmd(command)
-    
-    
-    def setGripperWidth(self,platewidth):
-        self.openGripperPos = platewidth*3 #some sort of logic to convert plate width to gripper positions
-        self.closedGripperPos = platewidth*2.5
-
+    #Don't have GSB working at full functionality yet so don't know what these methods will look like
+    #it will certainly still use 'MoveOneAxis 5 x profile' as the command 
+    #x is the desired gripper position, which is still unknown
     def openGripper(self,profile):
-        command = f"moveOneAxis 5 {self.openGripperPos} {profile}"
+        command = f"moveOneAxis 5 x {profile}"
         self.sendcmd(command)
 
     def closeGripper(self,profile):
-        command = f"moveOneAxis 5 {self.openGripperPos} {profile}"
+        command = f"moveOneAxis 5 x {profile}"
         self.sendcmd(command)
         #must tweak gripper open and close positions depending on what it's picking up!
 
