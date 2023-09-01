@@ -172,7 +172,7 @@ class PF3400Controller:
     
         while True:
             tptype = input("Would you like to set Cartesian or Joint TeachPoints? Enter 'c' for Cartesian or 'j' for Joint: ")
-        
+            print(tptype)
             if tptype == "c" or tptype == "j":
                 break  # Exit the loop if valid input is provided
             else:
@@ -182,7 +182,7 @@ class PF3400Controller:
         
         while True:
             value = input("How many Teach Points do you wish to set? Enter an integer between 1 and 20: ")
-        
+            print(value)
             if value.isdigit():  # Check if input is a valid integer
                 n = int(value)
                 if 1 <= n <= 20:
